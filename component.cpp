@@ -5,61 +5,61 @@
 #include "component.hpp"
 
 Component::Component() {
-	colorDrawable = new ColorDrawable();
+    colorDrawable = new ColorDrawable();
 }
 
 Component::~Component() {
-	delete colorDrawable;
+    delete colorDrawable;
 }
 
 
 void Component::setParent(Drawable *parent) {
-	throw "unsupported operation: Component::setParent(Drawable*)";
+    throw "unsupported operation: Component::setParent(Drawable*)";
 }
 
 void Component::setParent(Component *component) {
-	Drawable::setParent(component);
+    Drawable::setParent(component);
 }
 
-Component* Component::getParent() const {
-	return dynamic_cast<Component*>(Drawable::getParent());
+Component *Component::getParent() const {
+    return dynamic_cast<Component *>(Drawable::getParent());
 }
 
 
 void Component::setBackground(Drawable *drawable) {
-	if(background)
-		background->setParent(nullptr);
-	background = drawable;
-	if(background) {
-		background->setBounds(getBounds());
-		background->setParent(this);
-	}
-	invalidateSelf();
+    if (background)
+        background->setParent(nullptr);
+    background = drawable;
+    if (background) {
+        background->setBounds(getBounds());
+        background->setParent(this);
+    }
+    invalidateSelf();
 }
 
 void Component::setBackgroundColor(int color) {
-	colorDrawable->setColor(color);
-	setBackground(colorDrawable);
+    colorDrawable->setColor(color);
+    setBackground(colorDrawable);
 }
 
 
 void Component::draw(Canvas *canvas) {
-	if(background)
-		background->draw(canvas);
+    if (background)
+        background->draw(canvas);
 }
 
 
 bool Component::onKeyDown(KeyEvent &event) {
-	return false;
+    return false;
 }
 
 bool Component::onKeyUp(KeyEvent &event) {
-	return false;
+    return false;
 }
 
 void Component::onBoundsChanged(RectF oldBounds, RectF newBounds) {
-	Drawable::onBoundsChanged(oldBounds, newBounds);
-	if(background)
-		background->setBounds(newBounds);
+    Drawable::onBoundsChanged(oldBounds, newBounds);
+    if (background)
+        background->setBounds(newBounds);
 }
 

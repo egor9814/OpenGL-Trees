@@ -5,20 +5,20 @@
 #include "key_event.hpp"
 
 KeyEvent::KeyEvent(float x, float y, char key, int specialKey)
-		: x(x), y(y), key(key), specialKey(specialKey) {}
+        : x(x), y(y), key(key), specialKey(specialKey) {}
 
 float KeyEvent::getX() const {
-	return x;
+    return x;
 }
 
 float KeyEvent::getY() const {
-	return y;
+    return y;
 }
 
 char KeyEvent::getKey() const {
-	return key;
+    return key;
 }
 
 int KeyEvent::getSpecialKey() const {
-	return specialKey;
+    return specialKey;
 }

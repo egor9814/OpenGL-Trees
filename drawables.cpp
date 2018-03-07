@@ -5,18 +5,18 @@
 #include "drawables.hpp"
 
 ColorDrawable::ColorDrawable(int color)
-		: color(color){}
+        : color(color) {}
 
 void ColorDrawable::setColor(int color) {
-	this->color = color;
+    this->color = color;
 }
 
 int ColorDrawable::getColor() const {
-	return color;
+    return color;
 }
 
 
 void ColorDrawable::draw(Canvas *canvas) {
-	if(canvas)
-		canvas->draw(getBounds(), Paint().setColor(color));
+    if (canvas)
+        canvas->draw(getBounds(), Paint().setColor(color));
 }

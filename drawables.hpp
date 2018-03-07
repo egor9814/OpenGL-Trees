@@ -8,15 +8,16 @@
 #include "canvas.hpp"
 
 class ColorDrawable : public Drawable {
-	int color;
+    int color;
 
 public:
-	explicit ColorDrawable(int color = 0);
+    explicit ColorDrawable(int color = 0);
 
-	void setColor(int color);
-	int getColor() const ;
+    void setColor(int color);
 
-	void draw(Canvas *canvas) override;
+    int getColor() const;
+
+    void draw(Canvas *canvas) override;
 };
 
 #endif //OPENGL_TREES_DRAWABLES_HPP
