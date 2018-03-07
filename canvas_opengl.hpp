@@ -62,6 +62,10 @@ class OpenGLApplication {
 	std::function<void()> exitCallback;
 
 public:
+	static void fullscreen();
+	static void quit();
+	static void restoreWindow(int x, int y, int w, int h);
+
 	explicit OpenGLApplication(Component*);
 	~OpenGLApplication();
 

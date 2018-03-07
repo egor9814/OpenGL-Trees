@@ -175,6 +175,20 @@ void DrawableCallbackGL::requestInvalidateSelf() {
 }
 
 
+void OpenGLApplication::fullscreen() {
+	glutFullScreen();
+}
+
+void OpenGLApplication::quit() {
+	exit(0);
+}
+
+void OpenGLApplication::restoreWindow(int x, int y, int w, int h) {
+	glutReshapeWindow(w, h);
+	glutPositionWindow(x, y);
+}
+
+
 static OpenGLApplication* application = nullptr;
 
 OpenGLApplication::OpenGLApplication(Component * c)

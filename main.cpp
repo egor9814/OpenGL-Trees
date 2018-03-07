@@ -2,6 +2,25 @@
 #include "component.hpp"
 #include "canvas_opengl.hpp"
 
+struct WindowState {
+	int w=0, h=0;
+	bool fullscreen = false;
+
+	void fullscreenToggle(RectF bounds){
+		fullscreen = !fullscreen;
+		if(fullscreen){
+			w = bounds.width();
+			h = bounds.height();
+			OpenGLApplication::fullscreen();
+		} else {
+			OpenGLApplication::restoreWindow(0, 0, w, h);
+		}
+	}
+};
+
+static WindowState state;
+
+
 class TestView : public Component {
 	ColorDrawable color;
 	RectF padding {50,50,50,50};
@@ -72,6 +91,15 @@ public:
 				}
 				invalidateSelf();
 			} return true;
+
+			case 'f':
+				::state.fullscreenToggle(getBounds());
+				return true;
+
+			case 'q':
+				OpenGLApplication::quit();
+				return false;
+
 			default:
 				return Component::onKeyDown(event);
 		}
