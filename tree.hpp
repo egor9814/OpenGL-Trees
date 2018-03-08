@@ -64,8 +64,10 @@ private:
 
     /** Recursive method for delete all nodes */
     void removeNodes(Node *&root) {
+        if(!root)
+            return;
         for (unsigned long i = 0; i < root->childCount; i++) {
-            if (root->child[i] != nullptr) {
+            if (root->child[i]) {
                 removeNodes(root->child[i]);
             }
         }
@@ -92,7 +94,7 @@ private:
             return root;
         for (unsigned long i = 0; i < root->childCount; i++) {
             auto node = findNode(key, root->child[i]);
-            if (node != nullptr)
+            if (node)
                 return node;
         }
         return nullptr;
@@ -100,7 +102,7 @@ private:
 
     /** Height of node */
     unsigned long height(Node *root) {
-        if (root == nullptr)
+        if (!root)
             return 0;
         unsigned long max = root->height;
         for (unsigned long i = 0; i < root->childCount; i++) {

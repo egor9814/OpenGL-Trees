@@ -104,7 +104,9 @@ void Drawable::setDrawableCallback(DrawableCallback *drawableCallback) {
 }
 
 void Drawable::invalidateSelf() {
-    if (drawableCallback) {
+    if(parent)
+        parent->invalidateSelf();
+    else if (drawableCallback) {
         drawableCallback->requestInvalidateSelf();
     }
 }

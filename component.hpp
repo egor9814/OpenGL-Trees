@@ -23,8 +23,6 @@ public:
 
     void setParent(Drawable *parent) override;
 
-    void setParent(Component *component);
-
     Component *getParent() const override;
 
 

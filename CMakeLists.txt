@@ -17,6 +17,10 @@ set(SOURCE_FILES
         key_event.cpp key_event.hpp
         component.cpp component.hpp
         drawables.cpp drawables.hpp
+        binary_tree.cpp binary_tree.hpp
+        random.cpp random.hpp
+        search_tree.cpp search_tree.hpp
+        config.cpp config.hpp
         )
 add_executable(trees ${SOURCE_FILES})
 

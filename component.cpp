@@ -14,11 +14,7 @@ Component::~Component() {
 
 
 void Component::setParent(Drawable *parent) {
-    throw "unsupported operation: Component::setParent(Drawable*)";
-}
-
-void Component::setParent(Component *component) {
-    Drawable::setParent(component);
+    Drawable::setParent(parent);
 }
 
 Component *Component::getParent() const {

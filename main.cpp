@@ -1,27 +1,110 @@
 #include <iostream>
 #include "component.hpp"
 #include "canvas_opengl.hpp"
+#include "random.hpp"
+#include "search_tree.hpp"
+#include "config.hpp"
 
-struct WindowState {
-    int w = 0, h = 0;
-    bool fullscreen = false;
+void fullscreenToggle(Config* config, RectF bounds) {
+    config->lastState.fullscreen = !config->lastState.fullscreen;
+    if (config->lastState.fullscreen) {
+        config->lastState.width = bounds.width();
+        config->lastState.height = bounds.height();
+        OpenGLApplication::fullscreen();
+    } else {
+        OpenGLApplication::restoreWindow(0, 0, config->lastState.width, config->lastState.height);
+    }
+}
 
-    void fullscreenToggle(RectF bounds) {
-        fullscreen = !fullscreen;
-        if (fullscreen) {
-            w = bounds.width();
-            h = bounds.height();
-            OpenGLApplication::fullscreen();
-        } else {
-            OpenGLApplication::restoreWindow(0, 0, w, h);
+class MyTree;
+class MainWindow : public Component {
+    Config* config;
+    BinaryTree* tree;
+
+public:
+    explicit MainWindow(MyTree* tree);
+
+    ~MainWindow() override {
+        delete config;
+    }
+
+    bool onKeyDown(KeyEvent &event) override {
+        if(!tree->onKeyDown(event)){
+            switch (event.getSpecialKey()){
+                default:
+                    return Component::onKeyDown(event);
+                case KeyEvent::KEY_F11:
+                    ::fullscreenToggle(config, getBounds());
+                    return true;
+            }
         }
+        return true;
+    }
+
+    bool onKeyUp(KeyEvent &event) override {
+        if(!tree->onKeyUp(event))
+            return Component::onKeyUp(event);
+        return true;;
     }
 };
 
-static WindowState state;
 
+class MyTree : public SearchTree {
+    Config* config = nullptr;
+public:
+    MyTree() : SearchTree() {}
+    MyTree(unsigned long keyCount, const std::function<int(std::vector<int> &)> &randomKeyGenerator)
+            : SearchTree(keyCount, randomKeyGenerator) {}
+    MyTree(unsigned long keyCount, int *keys) : SearchTree(keyCount, keys) {}
+    explicit MyTree(std::vector<int> &keys) : SearchTree(keys) {}
 
-class TestView : public Component {
+    void setConfig(Config* config){
+        this->config = config;
+    }
+
+protected:
+    int getColorForPath(unsigned long nodeIndex) override {
+        if(config == nullptr)
+            return SearchTree::getColorForPath(nodeIndex);
+        switch (nodeIndex){
+            default:
+                return config->binaryTree.pathColor;
+            case 0:
+                return config->binaryTree.pathColorLeft;
+            case 1:
+                return config->binaryTree.pathColorRight;
+        }
+    }
+    int getColorForNode(unsigned long nodeIndex) override {
+        if(config == nullptr)
+            return SearchTree::getColorForNode(nodeIndex);
+        switch (nodeIndex){
+            default:
+                return config->binaryTree.color;
+            case 0:
+                return config->binaryTree.colorLeft;
+            case 1:
+                return config->binaryTree.colorRight;
+        }
+    }
+
+    int getTextColor() override {
+        return config == nullptr ? SearchTree::getTextColor() : config->binaryTree.textColor;
+    }
+
+    int getBackgroundColor() override {
+        return config == nullptr ? SearchTree::getBackgroundColor() : config->binaryTree.backgroundColor;
+    }
+};
+
+MainWindow::MainWindow(MyTree *tree)
+        : tree(tree){
+    config = defaultConfig();
+    setBackground(tree);
+    tree->setConfig(config);
+}
+
+/*class TestView : public Component {
     ColorDrawable color;
     RectF padding{50, 50, 50, 50};
     int mode = 0;
@@ -105,24 +188,44 @@ public:
                 return Component::onKeyDown(event);
         }
     }
-};
+};*/
+
+
 
 int main(int argc, char *argv[]) {
     std::cout << "Hello, World!" << std::endl;
 
-    RectF bounds{0, 0, 600, 400};
+    Random r;
+    auto const count = 15 + r.nextInt(11);
 
-    TestView test;
-    //test.setBounds(bounds);
-    test.setBackgroundColor(0xffff0000);
+    MyTree tree((unsigned long) count, [&](std::vector<int>& keys) -> int {
+        auto k = r.nextInt(1000);
+        bool has = true;
+        while(has){
+            has = false;
+            for(auto &i : keys){
+                if(i == k){
+                    has = true;
+                    break;
+                }
+            }
+            if(has){
+                k = r.nextInt(1000);
+            }
+        }
+        return k;
+    });
 
-    OpenGLApplication app(&test);
+    MainWindow window(&tree);
+
+    OpenGLApplication app(&window);
     app.init(argc, argv, true);
     app.setExitCallback([]() {
         std::cout << "finished!" << std::endl;
+		Random::free();
     });
 
-    app.start("TestView", bounds.width(), bounds.height());
+    app.start("TestView", 800, 600);
 
     return 0;
 }

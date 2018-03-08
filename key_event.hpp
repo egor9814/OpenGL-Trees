@@ -12,6 +12,19 @@ class KeyEvent {
     int specialKey;
 
 public:
+    static const int KEY_F1 = 1;
+    static const int KEY_F2 = 2;
+    static const int KEY_F3 = 3;
+    static const int KEY_F4 = 4;
+    static const int KEY_F5 = 5;
+    static const int KEY_F6 = 6;
+    static const int KEY_F7 = 7;
+    static const int KEY_F8 = 8;
+    static const int KEY_F9 = 9;
+    static const int KEY_F10 = 10;
+    static const int KEY_F11 = 11;
+    static const int KEY_F12 = 12;
+
     KeyEvent(float x, float y, char key, int specialKey);
 
     /** Get X key down/up location */

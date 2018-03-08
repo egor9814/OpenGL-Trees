@@ -2,6 +2,7 @@
 // Created by egor9814 on 07.03.18.
 //
 
+#include <GL/glut.h>
 #include "key_event.hpp"
 
 KeyEvent::KeyEvent(float x, float y, char key, int specialKey)
@@ -22,3 +23,4 @@ char KeyEvent::getKey() const {
 int KeyEvent::getSpecialKey() const {
     return specialKey;
 }
+
