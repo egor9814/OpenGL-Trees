@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(glfw3 3 REQUIRED)
+find_package(Threads REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
 
 set(SOURCE_FILES
@@ -31,4 +32,5 @@ target_link_libraries(trees
         ${MATH_LIBRARY}
         ${GLEW_LIBRARY}
         ${GLUT_LIBRARY}
+        ${CMAKE_THREAD_LIBS_INIT}
         )

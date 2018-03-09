@@ -20,24 +20,20 @@ bool BinaryTree::isSearchTree() {
 
 
 template<typename KeyType>
-void rootLeftRight(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey) {
-    if (node == nullptr) {
-        keys.push_back(noneKey);
-    } else {
+void rootLeftRight(std::vector<KeyType> &keys, BinaryTreeNode *node) {
+    if (node) {
         keys.push_back(node->key);
-        rootLeftRight(keys, node->left(), noneKey);
-        rootLeftRight(keys, node->right(), noneKey);
+        rootLeftRight(keys, node->left());
+        rootLeftRight(keys, node->right());
     }
 }
 
 template<typename KeyType>
-void rootRightLeft(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey) {
-    if (node == nullptr) {
-        keys.push_back(noneKey);
-    } else {
+void rootRightLeft(std::vector<KeyType> &keys, BinaryTreeNode *node) {
+    if (node) {
         keys.push_back(node->key);
-        rootRightLeft(keys, node->right(), noneKey);
-        rootRightLeft(keys, node->left(), noneKey);
+        rootRightLeft(keys, node->right());
+        rootRightLeft(keys, node->left());
     }
 }
 
@@ -45,13 +41,13 @@ template<typename KeyType>
 void leftRootRight(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey,
                    unsigned long maxLevel,
                    unsigned long level = 1) {
-    if (node == nullptr) {
+    if (!node) {
         if (level <= maxLevel)
             keys.push_back(noneKey);
     } else {
         leftRootRight(keys, node->left(), noneKey, maxLevel, level + 1);
-        leftRootRight(keys, node->right(), noneKey, maxLevel, level + 1);
         keys.push_back(node->key);
+        leftRootRight(keys, node->right(), noneKey, maxLevel, level + 1);
     }
 }
 
@@ -59,13 +55,13 @@ template<typename KeyType>
 void rightRootLeft(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey,
                    unsigned long maxLevel,
                    unsigned long level = 1) {
-    if (node == nullptr) {
+    if (!node) {
         if (level <= maxLevel)
             keys.push_back(noneKey);
     } else {
         rightRootLeft(keys, node->right(), noneKey, maxLevel, level + 1);
-        rightRootLeft(keys, node->left(), noneKey, maxLevel, level + 1);
         keys.push_back(node->key);
+        rightRootLeft(keys, node->left(), noneKey, maxLevel, level + 1);
     }
 }
 
@@ -73,14 +69,14 @@ template<typename KeyType>
 void byLevels(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey) {
     keys.push_back(node->key);
     for (auto i = 0UL; i < node->childCount; i++) {
-        if (node->child[i] == nullptr) {
+        if (!node->child[i]) {
             keys.push_back(noneKey);
         } else {
             keys.push_back(node->child[i]->key);
         }
     }
     for (auto i = 0UL; i < node->childCount; i++) {
-        if (node->child[i] != nullptr) {
+        if (node->child[i]) {
             byLevels(keys, node->child[i], noneKey);
         }
     }
@@ -90,26 +86,29 @@ template<typename KeyType>
 void leftRightRoot(std::vector<KeyType> &keys, BinaryTreeNode *node, KeyType &noneKey) {
     if (node == nullptr)
         return;
-    if (node->left() != nullptr) {
+    if (node->left()) {
         leftRightRoot(keys, node->left(), noneKey);
+    } else if (node->right()) {
+        leftRightRoot(keys, node->right(), noneKey);
     }
     keys.push_back(node->key);
-    if (node->parent != nullptr && node->parent->right() != node) {
+    if (node->parent && node->parent->right() != node) {
         leftRightRoot(keys, node->parent->right(), noneKey);
     }
 }
 
 template<typename KeyType>
-inline void visit(std::vector<KeyType> &keys, BinaryTreeNode *node, BinaryTree::VisitType type, KeyType &noneKey,
+inline void visit(std::vector<KeyType> &keys, BinaryTreeNode *node, BinaryTree::VisitType &type,
+                  KeyType &noneKey,
                   unsigned long height) {
     switch (type) {
         default:
             break;
         case BinaryTree::VisitType_RootLeftRight:
-            rootLeftRight(keys, node, noneKey);
+            rootLeftRight(keys, node);
             break;
         case BinaryTree::VisitType_RootRightLeft:
-            rootRightLeft(keys, node, noneKey);
+            rootRightLeft(keys, node);
             break;
         case BinaryTree::VisitType_LeftRootRight:
             leftRootRight(keys, node, noneKey, height);
@@ -126,10 +125,15 @@ inline void visit(std::vector<KeyType> &keys, BinaryTreeNode *node, BinaryTree::
     }
 }
 
-std::vector<int> BinaryTree::visit(Node *node, KeyType noneKey, VisitType type) {
+std::vector<int> BinaryTree::visit(Node *node, VisitType type) {
     std::vector<BinaryTree::KeyType> keys;
+    auto noneKey = getNoneKey();
     ::visit(keys, node, type, noneKey, findHeight());
     return keys;
+}
+
+int BinaryTree::getNoneKey() {
+    return -1;
 }
 
 

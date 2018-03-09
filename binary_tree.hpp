@@ -51,10 +51,10 @@ public:
         VisitType_LeftRightRoot,
     };
 
-    std::vector<KeyType> visit(Node *node, KeyType noneKey, VisitType type = VisitType_NONE);
+    std::vector<KeyType> visit(Node *node, VisitType type = VisitType_NONE);
 
-    std::vector<KeyType> visit(KeyType noneKey, VisitType type = VisitType_NONE) {
-        return visit(root, noneKey, type);
+    std::vector<KeyType> visit(VisitType type = VisitType_NONE) {
+        return visit(root, type);
     }
 
     virtual bool isSearchTree();
@@ -64,6 +64,8 @@ protected:
     int randomKey() override;
 
     void readAndAddKey();
+
+    virtual int getNoneKey();
 
 public:
     bool onKeyDown(KeyEvent &event) override;

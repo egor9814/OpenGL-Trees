@@ -205,11 +205,17 @@ OpenGLApplication::~OpenGLApplication() {
 
 
 void onDraw();
+
 void onKeyPress(unsigned char key, int x, int y);
+
 void onKeyRelease(unsigned char key, int x, int y);
+
 void onKeySpecialPress(int key, int x, int y);
+
 void onKeySpecialRelease(int key, int x, int y);
+
 void onWindowResize(int w, int h);
+
 void onTerminated();
 
 void OpenGLApplication::init(int &argc, char **argv, bool doubleBuffer) {
@@ -247,6 +253,15 @@ void OpenGLApplication::start(const char *title, int width, int height) {
     glutMainLoop();
 }
 
+/*void startAsyncApp(const char *title, int width, int height){
+    application->start(title, width, height);
+}*/
+std::thread *OpenGLApplication::startAsync(const char *title, int width, int height) {
+    //return new std::thread(::startAsyncApp, title, width, height);
+    return new std::thread([](const char *title_, int width_, int height_) {
+        ::application->start(title_, width_, height_);
+    }, title, width, height);
+}
 
 void onDraw() {
     if (application)
@@ -330,7 +345,7 @@ void OpenGLApplication::signal_onWindowResize(int &w, int &h) {
     glLoadIdentity();
     if (component) {
         canvasGL->resize(w, h);
-        component->setBounds({0, 0, w, h});
+        component->setBounds({0, 0, (float) w, (float) h});
     }
 }
 

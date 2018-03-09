@@ -103,6 +103,7 @@ void SearchTree::remove(int key) {
             setRoot(removed);
         }
     }
+    invalidateSelf();
 }
 
 /*BinaryTreeNode *findKey(BinaryTreeNode *node, int &key) {

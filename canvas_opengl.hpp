@@ -6,6 +6,7 @@
 #define OPENGL_TREES_CANVAS_OPENGL_HPP
 
 #include <functional>
+#include <thread>
 #include "canvas.hpp"
 #include "component.hpp"
 
@@ -79,6 +80,8 @@ public:
     void setExitCallback(std::function<void()> &&exitCallback);
 
     void start(const char *title, int width, int height);
+
+    std::thread *startAsync(const char *title, int width, int height);
 
 
     // slots:

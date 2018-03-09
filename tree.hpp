@@ -64,7 +64,7 @@ private:
 
     /** Recursive method for delete all nodes */
     void removeNodes(Node *&root) {
-        if(!root)
+        if (!root)
             return;
         for (unsigned long i = 0; i < root->childCount; i++) {
             if (root->child[i]) {
@@ -101,17 +101,14 @@ private:
     }
 
     /** Height of node */
-    unsigned long height(Node *root) {
+    void height(Node *root, unsigned long &h) {
         if (!root)
-            return 0;
-        unsigned long max = root->height;
-        for (unsigned long i = 0; i < root->childCount; i++) {
-            auto h = height(root->child[i]);
-            if (h > max) {
-                max = h;
-            }
+            return;
+        if (root->height > h)
+            h = root->height;
+        for (auto i = 0UL; i < root->childCount; i++) {
+            height(root->child[i], h);
         }
-        return max;
     }
 
 public:
@@ -142,7 +139,7 @@ public:
         }
     }
 
-    virtual ~Tree() override {
+    ~Tree() override {
         clear();
         delete removeCandidate;
         delete foundCandidate;
@@ -190,7 +187,9 @@ public:
 
     /** Find height of tree */
     unsigned long findHeight() {
-        return root == nullptr ? 0 : height(root);
+        auto h = 0UL;
+        height(root, h);
+        return h;
     }
 
 
@@ -203,6 +202,10 @@ public:
                 return true;
             case 'a':
                 add(randomKey());
+                if (foundCandidate) {
+                    delete foundCandidate;
+                    foundCandidate = nullptr;
+                }
                 invalidateSelf();
                 return true;
             case 'r':
@@ -216,6 +219,10 @@ public:
                 return true;
             case 'R':
                 clear();
+                if (foundCandidate) {
+                    delete foundCandidate;
+                    foundCandidate = nullptr;
+                }
                 invalidateSelf();
                 return true;
         }
@@ -232,34 +239,43 @@ public:
         if (treeH != 0) {
             //const auto WIDTH = height(root) * root->childCount * R + (root->childCount - 1) * OFFSET;
             //const auto x = (WIDTH + START_OFFSET + OFFSET) / root->childCount;
-            const auto WIDTH = canvas->getWidth() - OFFSET;
-            const auto HEIGHT = canvas->getHeight() - OFFSET;
+            auto bounds = getBounds();
+            const auto WIDTH = bounds.width() - OFFSET;
+            const auto HEIGHT = bounds.height() - OFFSET;
 
             auto layout = RectF {OFFSET / 2, R * 2, WIDTH - OFFSET / 2, 0};
 
             auto offset = (HEIGHT - R * 2) / treeH;
-            //offset = std::max(R/2, offset);
+            offset = std::max(R/2, offset);
             RectF padding{0, 0, offset, offset};
 
             std::vector<GraphicNode> nodes;
             getNodes(root, layout, R, W, padding, nodes, static_cast<unsigned long>(-1));
 
-            if (removeCandidate != nullptr && removeCandidate->setup) {
+            if (removeCandidate && removeCandidate->setup) {
                 remove(removeCandidate->key);
                 delete removeCandidate;
                 removeCandidate = nullptr;
-                draw(canvas);
+                invalidateSelf();
             } else {
-                if (foundCandidate != nullptr && foundCandidate->setup) {
+                if (foundCandidate && foundCandidate->setup) {
                     foundCandidate->draw(canvas, 3 * R / 4, 0xffffff00);
-                    delete foundCandidate;
-                    foundCandidate = nullptr;
+                    /*delete foundCandidate;
+                    foundCandidate = nullptr;*/
                 }
 
                 GraphicNode root = nodes[0];
                 drawPaths(canvas, root, root.nodes);
                 drawCircles(canvas, root, root.nodes, treeH - 1);
             }
+        }
+    }
+
+    void onBoundsChanged(RectF oldBounds, RectF newBounds) override {
+        Component::onBoundsChanged(oldBounds, newBounds);
+        if (foundCandidate) {
+            delete foundCandidate;
+            foundCandidate = nullptr;
         }
     }
 
@@ -338,8 +354,8 @@ private:
             startX = layout.left;*/
         const auto startY = layout.centerY();
 
-        if (foundCandidate != nullptr && !foundCandidate->setup) {
-            if (removeCandidate == nullptr || !removeCandidate->setup) {
+        if (foundCandidate && !foundCandidate->setup) {
+            if (!removeCandidate || !removeCandidate->setup) {
                 if (n->key == foundCandidate->key) {
                     foundCandidate->x = startX;
                     foundCandidate->y = startY;
@@ -348,7 +364,7 @@ private:
             }
         }
 
-        if (removeCandidate != nullptr && !removeCandidate->setup) {
+        if (removeCandidate && !removeCandidate->setup) {
             auto x = removeCandidate->x;
             auto y = removeCandidate->y;
 
@@ -356,8 +372,9 @@ private:
             if (x >= startX - hr && x <= startX + hr && y >= startY - hr && y <= startY + hr) {
                 removeCandidate->key = n->key;
                 removeCandidate->setup = true;
-                if (foundCandidate != nullptr) {
-                    foundCandidate->setup = false;
+                if (foundCandidate) {
+                    delete foundCandidate;
+                    foundCandidate = nullptr;
                 }
             }/* else {
 				delete removeCandidate;
@@ -374,7 +391,7 @@ private:
             const auto width = layout.width() / count;
 
             auto sector = RectF {layout.left, startY, layout.left + width, startY + padding.height() * 2}
-                    .translateY(r / 2);
+                    .translateY(r/2);
             /*auto p = layout.left+pw/2;
             if(sector.right + p < layout.right){
                 sector.translateX(p);
@@ -439,6 +456,9 @@ private:
         float x, y; /// founded locations
         bool setup; /// indicator of node founded
 
+        FoundCandidate(KeyType key, bool setup)
+                : key(key), x(0), y(0), setup(setup) {}
+
         /** Draw founded location */
         inline void draw(Canvas *c, float radius, int color) {
             if (setup) {
@@ -449,14 +469,18 @@ private:
 
     FoundCandidate *foundCandidate = nullptr;
 
-protected:
+public:
     /** Find node by key and draw location */
-    void findAndDraw(KeyType key) {
-        if (foundCandidate != nullptr) {
+    void findKeyAndDraw(KeyType key) {
+        if (foundCandidate) {
             delete foundCandidate;
         }
-        foundCandidate = new FoundCandidate;
-        foundCandidate->key = key;
+        foundCandidate = new FoundCandidate{key, false};
+        invalidateSelf();
+    }
+
+    void requestRedraw() {
+        invalidateSelf();
     }
 };
 
