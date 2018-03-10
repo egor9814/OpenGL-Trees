@@ -4,7 +4,7 @@
 
 #include <ctime>
 #include <algorithm>
-#include "random.hpp"
+#include "include/GLext/random.hpp"
 
 struct seed_holder {
     long value;

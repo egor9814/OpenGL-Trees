@@ -2,7 +2,7 @@
 // Created by egor9814 on 07.03.18.
 //
 
-#include "component.hpp"
+#include "include/GLext/component.hpp"
 
 Component::Component() {
     colorDrawable = new ColorDrawable();

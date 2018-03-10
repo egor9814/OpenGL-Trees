@@ -2,7 +2,7 @@
 // Created by egor9814 on 07.03.18.
 //
 
-#include "drawables.hpp"
+#include "include/GLext/drawables.hpp"
 
 ColorDrawable::ColorDrawable(int color)
         : color(color) {}

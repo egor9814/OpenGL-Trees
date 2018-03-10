@@ -9,14 +9,15 @@ find_package(GLUT REQUIRED)
 find_package(glfw3 3 REQUIRED)
 find_package(Threads REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+include_directories(glext/include)
 
 add_library(glext SHARED
-        glext/canvas.cpp glext/canvas.hpp
-        glext/canvas_opengl.cpp glext/canvas_opengl.hpp
-        glext/key_event.cpp glext/key_event.hpp
-        glext/component.cpp glext/component.hpp
-        glext/drawables.cpp glext/drawables.hpp
-        glext/random.cpp glext/random.hpp
+        glext/canvas.cpp glext/include/GLext/canvas.hpp
+        glext/canvas_opengl.cpp glext/include/GLext/canvas_opengl.hpp
+        glext/key_event.cpp glext/include/GLext/key_event.hpp
+        glext/component.cpp glext/include/GLext/component.hpp
+        glext/drawables.cpp glext/include/GLext/drawables.hpp
+        glext/random.cpp glext/include/GLext/random.hpp
         )
 target_link_libraries(glext
         glfw

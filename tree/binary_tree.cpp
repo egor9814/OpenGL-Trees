@@ -3,7 +3,7 @@
 //
 
 #include "binary_tree.hpp"
-#include "../glext/random.hpp"
+#include <GLext/random.hpp>
 
 bool isSearchTree(BinaryTreeNode *node) {
     auto l = node->left();

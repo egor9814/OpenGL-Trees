@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
-#include "../glext/component.hpp"
-#include "../glext/canvas_opengl.hpp"
-#include "../glext/random.hpp"
+#include <GLext/component.hpp>
+#include <GLext/canvas_opengl.hpp>
+#include <GLext/random.hpp>
 #include "search_tree.hpp"
 #include "config.hpp"
 

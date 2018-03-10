@@ -6,7 +6,7 @@
 #define OPENGL_TREES_TREE_HPP
 
 #include <functional>
-#include "../glext/component.hpp"
+#include <GLext/component.hpp>
 
 
 /** Tree node
@@ -256,7 +256,8 @@ public:
                 remove(removeCandidate->key);
                 delete removeCandidate;
                 removeCandidate = nullptr;
-                invalidateSelf();
+                //invalidateSelf(); // it is very HARD call
+                draw(canvas);
             } else {
                 if (foundCandidate && foundCandidate->setup) {
                     foundCandidate->draw(canvas, 3 * R / 4, 0xffffff00);

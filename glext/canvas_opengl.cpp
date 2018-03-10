@@ -2,7 +2,7 @@
 // Created by egor9814 on 07.03.18.
 //
 
-#include "canvas_opengl.hpp"
+#include "include/GLext/canvas_opengl.hpp"
 #include <GL/glut.h>
 #include <cmath>
 

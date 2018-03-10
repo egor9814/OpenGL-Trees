@@ -2,7 +2,7 @@
 // Created by egor9814 on 07.03.18.
 //
 
-#include "canvas.hpp"
+#include "include/GLext/canvas.hpp"
 
 Paint &Paint::setAntiAlias(bool enabled) {
     antiAlias = enabled;

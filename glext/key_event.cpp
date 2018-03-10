@@ -3,7 +3,7 @@
 //
 
 #include <GL/glut.h>
-#include "key_event.hpp"
+#include "include/GLext/key_event.hpp"
 
 KeyEvent::KeyEvent(float x, float y, char key, int specialKey)
         : x(x), y(y), key(key), specialKey(specialKey) {}
