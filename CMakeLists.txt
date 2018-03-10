@@ -10,22 +10,15 @@ find_package(glfw3 3 REQUIRED)
 find_package(Threads REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
 
-set(SOURCE_FILES
-        main.cpp
-        tree.cpp tree.hpp
-        canvas.cpp canvas.hpp
-        canvas_opengl.cpp canvas_opengl.hpp
-        key_event.cpp key_event.hpp
-        component.cpp component.hpp
-        drawables.cpp drawables.hpp
-        binary_tree.cpp binary_tree.hpp
-        random.cpp random.hpp
-        search_tree.cpp search_tree.hpp
-        config.cpp config.hpp
+add_library(glext SHARED
+        glext/canvas.cpp glext/canvas.hpp
+        glext/canvas_opengl.cpp glext/canvas_opengl.hpp
+        glext/key_event.cpp glext/key_event.hpp
+        glext/component.cpp glext/component.hpp
+        glext/drawables.cpp glext/drawables.hpp
+        glext/random.cpp glext/random.hpp
         )
-add_executable(trees ${SOURCE_FILES})
-
-target_link_libraries(trees
+target_link_libraries(glext
         glfw
         ${OPENGL_LIBRARIES}
         ${FREETYPE_LIBRARIES}
@@ -34,3 +27,25 @@ target_link_libraries(trees
         ${GLUT_LIBRARY}
         ${CMAKE_THREAD_LIBS_INIT}
         )
+macro(use_glext module)
+    target_link_libraries(${module} glext)
+endmacro()
+
+
+set(SOURCE_FILES
+        tree/main.cpp
+        tree/tree.cpp tree/tree.hpp
+        tree/binary_tree.cpp tree/binary_tree.hpp
+        tree/search_tree.cpp tree/search_tree.hpp
+        tree/config.cpp tree/config.hpp
+        )
+add_executable(tree ${SOURCE_FILES})
+use_glext(tree)
+
+
+set(SOURCE_FILES_BT
+        btree/main.cpp
+        btree/balanced_tree.cpp btree/balanced_tree.hpp
+        )
+add_executable(btree ${SOURCE_FILES_BT})
+use_glext(btree)

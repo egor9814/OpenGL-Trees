@@ -6,7 +6,7 @@
 #define OPENGL_TREES_TREE_HPP
 
 #include <functional>
-#include "component.hpp"
+#include "../glext/component.hpp"
 
 
 /** Tree node
@@ -22,8 +22,8 @@ struct TreeNode {
     const unsigned long childCount = ChildCount; /// maximum child count
     Node *parent; /// parent of current node
     Node *child[ChildCount]{nullptr}; /// children of current node
-    unsigned long height; /// height of curent node
-    unsigned long childNum = 0; /// child number (KOSTYL for add new node
+    unsigned long height; /// height of current node
+    unsigned long childNum = 0; /// child number (KOSTYL for add new node in simple tree)
 
     /** Get count of children */
     auto count() const {
