@@ -246,7 +246,7 @@ public:
             auto layout = RectF {OFFSET / 2, R * 2, WIDTH - OFFSET / 2, 0};
 
             auto offset = (HEIGHT - R * 2) / treeH;
-            offset = std::max(R/2, offset);
+            offset = std::max(R / 2, offset);
             RectF padding{0, 0, offset, offset};
 
             std::vector<GraphicNode> nodes;
@@ -392,7 +392,7 @@ private:
             const auto width = layout.width() / count;
 
             auto sector = RectF {layout.left, startY, layout.left + width, startY + padding.height() * 2}
-                    .translateY(r/2);
+                    .translateY(r / 2);
             /*auto p = layout.left+pw/2;
             if(sector.right + p < layout.right){
                 sector.translateX(p);

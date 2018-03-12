@@ -30,14 +30,30 @@ public:
 
     BinaryTree() : Tree() {}
 
-    BinaryTree(unsigned long keyCount, std::function<KeyType(std::vector<KeyType> &)> randomKeyGenerator)
-            : Tree(keyCount, std::move(randomKeyGenerator)) {}
+    BinaryTree(unsigned long keyCount, std::function<int(std::vector<int> &)> randomKeyGenerator)
+            : Tree() {
+        std::vector<int> keys;
+        for (unsigned long i = 0; i < keyCount; i++) {
+            keys.push_back(randomKeyGenerator(keys));
+        }
+        for (auto &i : keys) {
+            add(i);
+        }
+    }
 
-    BinaryTree(unsigned long keyCount, KeyType *keys)
-            : Tree(keyCount, keys) {}
+    BinaryTree(unsigned long keyCount, int *keys)
+            : Tree() {
+        for (unsigned long i = 0; i < keyCount; i++) {
+            add(keys[i]);
+        }
+    }
 
-    explicit BinaryTree(std::vector<KeyType> &keys)
-            : Tree(keys) {}
+    explicit BinaryTree(std::vector<int> &keys)
+            : Tree() {
+        for (auto &i : keys) {
+            add(i);
+        }
+    }
 
 
     enum VisitType {
@@ -64,8 +80,6 @@ protected:
     int randomKey() override;
 
     void readAndAddKey();
-
-    virtual int getNoneKey();
 
 public:
     bool onKeyDown(KeyEvent &event) override;

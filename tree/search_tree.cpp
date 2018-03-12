@@ -7,11 +7,27 @@
 SearchTree::SearchTree() : BinaryTree() {}
 
 SearchTree::SearchTree(unsigned long keyCount, const std::function<int(std::vector<int> &)> &randomKeyGenerator)
-        : BinaryTree(keyCount, randomKeyGenerator) {}
+        : BinaryTree() {
+    std::vector<int> keys;
+    for (unsigned long i = 0; i < keyCount; i++) {
+        keys.push_back(randomKeyGenerator(keys));
+    }
+    for (auto &i : keys) {
+        add(i);
+    }
+}
 
-SearchTree::SearchTree(unsigned long keyCount, int *keys) : BinaryTree(keyCount, keys) {}
+SearchTree::SearchTree(unsigned long keyCount, int *keys) : BinaryTree() {
+    for (unsigned long i = 0; i < keyCount; i++) {
+        add(keys[i]);
+    }
+}
 
-SearchTree::SearchTree(std::vector<int> &keys) : BinaryTree(keys) {}
+SearchTree::SearchTree(std::vector<int> &keys) : BinaryTree() {
+    for (auto &i : keys) {
+        add(i);
+    }
+}
 
 
 bool SearchTree::isSearchTree() {
@@ -106,7 +122,7 @@ void SearchTree::remove(int key) {
     invalidateSelf();
 }
 
-/*BinaryTreeNode *findKey(BinaryTreeNode *node, int &key) {
+BinaryTreeNode *findKey(BinaryTreeNode *node, int &key) {
     if (node == nullptr)
         return nullptr;
     if (node->key == key) {
@@ -122,8 +138,8 @@ void SearchTree::remove(int key) {
             return n;
     }
     return nullptr;
-}*/
+}
 BinaryTreeNode *SearchTree::findKey(int key) {
-    //return ::findKey(getRoot(), key);
-    return BinaryTree::findKey(key);
+    return ::findKey(getRoot(), key);
+    //return BinaryTree::findKey(key);
 }

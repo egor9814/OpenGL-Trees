@@ -312,9 +312,12 @@ int main(int argc, char *argv[]) {
             if (command.size() < 2) {
                 cerr << "type 'help add'" << endl;
             } else {
-                auto key = stoi(command[1]);
-                tree.add(key);
-                tree.requestRedraw();
+                auto it = command.begin();
+                for(it++; it != command.end(); it++){
+                    auto key = stoi(*it);
+                    tree.add(key);
+                    tree.requestRedraw();
+                }
             }
         } else if (command[0] == "remove") {
             if (command.size() < 2) {
@@ -323,8 +326,11 @@ int main(int argc, char *argv[]) {
                 if (command[1] == "all") {
                     tree.clear();
                 } else {
-                    auto key = stoi(command[1]);
-                    tree.remove(key);
+                    auto it = command.begin();
+                    for(it++; it != command.end(); it++){
+                        auto key = stoi(*it);
+                        tree.remove(key);
+                    }
                 }
                 tree.requestRedraw();
             }
@@ -357,6 +363,19 @@ int main(int argc, char *argv[]) {
                 visit(tree, MyTree::VisitType_LeftRightRoot);
             } else {
                 cerr << "error: unknown type: " << type << endl << "type 'help visit'" << endl;
+            }
+        } else if(command[0] == "get"){
+            if (command.size() < 2) {
+                cerr << "type 'help get'" << endl;
+            } else {
+                for(auto it = command.begin()++; it != command.end(); it++){
+                    if(*it == "height"){
+                        cout << "height: " << tree.findHeight() << endl;
+                    } else {
+                        cerr << "unknown property: " << *it << endl;
+                        cerr << "type 'help get'" << endl;
+                    }
+                }
             }
         } else {
             cerr << "error: unknown command: " << command[0] << endl;
