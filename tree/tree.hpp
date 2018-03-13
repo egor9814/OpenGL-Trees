@@ -61,10 +61,13 @@ protected:
 
 private:
     struct GraphicNode;
-    /// Constants for evaluating graphic node's location
-    constexpr static const float R = 40;
-    constexpr static const float W = 2;
-    constexpr static const float OFFSET = 50;
+    /// Variables for evaluating graphic node's location
+    float radius = 40;
+    float offset = 50;
+    float lineWidth = 2;
+    float textSize = 0.12f;
+
+private:
 
     /** Recursive method for delete all nodes */
     void removeNodes(Node *&root) {
@@ -229,6 +232,14 @@ public:
                 }
                 invalidateSelf();
                 return true;
+            case '+':
+                setRadius(getRadius() + 1);
+                invalidateSelf();
+                return true;
+            case '-':
+                setRadius(getRadius() - 1);
+                invalidateSelf();
+                return true;
         }
     }
 
@@ -244,18 +255,18 @@ public:
             //const auto WIDTH = height(root) * root->childCount * R + (root->childCount - 1) * OFFSET;
             //const auto x = (WIDTH + START_OFFSET + OFFSET) / root->childCount;
             auto bounds = getBounds();
-            const auto WIDTH = bounds.width() - OFFSET;
-            const auto HEIGHT = bounds.height() - OFFSET;
+            const auto WIDTH = bounds.width() - offset;
+            const auto HEIGHT = bounds.height() - offset;
 
             auto layout = RectF {0, 0, WIDTH, HEIGHT};
             //layout.translate(OFFSET / 2, OFFSET / 2);
 
             auto offset = HEIGHT / treeH;
-            offset = std::max(R*1, offset);
-            RectF padding{0, OFFSET / 2, OFFSET / 2, offset};
+            offset = std::max(radius * 1, offset);
+            RectF padding{0, this->offset / 2, this->offset / 2, offset};
 
             std::vector<GraphicNode> nodes;
-            getNodes(root, layout, R, W, padding, nodes, static_cast<unsigned long>(-1));
+            getNodes(root, layout, radius, lineWidth, padding, nodes, static_cast<unsigned long>(-1));
 
             if (removeCandidate && removeCandidate->setup) {
                 remove(removeCandidate->key);
@@ -265,7 +276,7 @@ public:
                 draw(canvas);
             } else {
                 if (foundCandidate && foundCandidate->setup) {
-                    foundCandidate->draw(canvas, 3 * R / 4, 0xffffff00);
+                    foundCandidate->draw(canvas, 3 * radius / 4, 0xffffff00);
                     /*delete foundCandidate;
                     foundCandidate = nullptr;*/
                 }
@@ -340,7 +351,7 @@ private:
     };
 
     /** Generate nodes for draw */
-    void getNodes(Node *n, RectF &layout, float r, float w, RectF &padding, std::vector<GraphicNode> &nodes,
+    void getNodes(Node *n, RectF &layout, float &r, float &w, RectF &padding, std::vector<GraphicNode> &nodes,
                   unsigned long index, unsigned long level = 0) {
         if (n == nullptr)
             return;
@@ -438,7 +449,8 @@ private:
             canvas->drawArc(x, y, 2 * r / 3, -135, -45, p);
             canvas->drawArc(x, y, 2 * r / 3, 45, 135, p);
         }
-        canvas->drawText(x - r / 2 + 1, y + r / 5, 0, root.key.c_str(), 0.12f, Paint(true).setColor(getTextColor()));
+        canvas->drawText(x - r / 2 + 1, y + r / 5, 0, root.key.c_str(), textSize,
+                         Paint(true).setColor(getTextColor()));
         for (GraphicNode &i : nodes) {
             drawCircles(canvas, i, i.nodes, level);
         }
@@ -483,6 +495,31 @@ public:
 
     void requestRedraw() {
         invalidateSelf();
+    }
+
+    float getRadius() const {
+        return radius;
+    }
+
+    void setRadius(float radius) {
+        Tree::radius = radius;
+        Tree::textSize = 0.002999999999f * radius;
+    }
+
+    float getOffset() const {
+        return offset;
+    }
+
+    void setOffset(float offset) {
+        Tree::offset = offset;
+    }
+
+    float getLineWidth() const {
+        return lineWidth;
+    }
+
+    void setLineWidth(float lineWidth) {
+        Tree::lineWidth = lineWidth;
     }
 };
 

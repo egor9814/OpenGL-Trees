@@ -235,6 +235,7 @@ int main(int argc, char *argv[]) {
         }
         return k;
     });
+    tree.setRadius(30);
 
     MainWindow window(&tree);
 
@@ -281,9 +282,18 @@ int main(int argc, char *argv[]) {
                     cout << "remove <key> - remove key from tree"
                             "(if <key> == all, then tree will be removed)" << endl;
                 } else if (command[1] == "get") {
-                    cout << "get <property> - get property of tree:" << endl;
+                    cout << "get <property> - get property of tree" << endl;
                     cout << "\tproperties:" << endl;
                     cout << "\t\theight - get tree's height" << endl;
+                    cout << "\t\tradius - get radius of node circle" << endl;
+                    cout << "\t\tline - get line width for draw" << endl;
+                    cout << "\t\twindow - get window size" << endl;
+                    //cout << "\t\t" << endl;
+                } else if (command[1] == "set") {
+                    cout << "set <property> - set property to tree" << endl;
+                    cout << "\tproperties:" << endl;
+                    cout << "\t\tradius <r> - set radius of node circle(<r> by default is 30)" << endl;
+                    cout << "\t\tline <l> - set line width for draw(<l> by default is 2)" << endl;
                     //cout << "\t\t" << endl;
                 } else if (command[1] == "visit") {
                     cout << "visit <type> - visit tree by type(by default: lrR)" << endl;
@@ -298,7 +308,7 @@ int main(int argc, char *argv[]) {
                     cerr << "error: unknown command: " << command[1] << endl;
                 }
             } else {
-                cout << "commands: " << endl << "\thelp, exit, find, add, remove, get, visit" << endl;
+                cout << "commands: " << endl << "\thelp, exit, find, add, remove, get, set, visit" << endl;
                 cout << "type 'help <command>' for get more info about command" << endl;
             }
         } else if (command[0] == "find") {
@@ -371,10 +381,43 @@ int main(int argc, char *argv[]) {
                 for(auto it = command.begin()++; it != command.end(); it++){
                     if(*it == "height"){
                         cout << "height: " << tree.findHeight() << endl;
+                    } else if(*it == "radius"){
+                        cout << "radius: " << tree.getRadius() << endl;
+                    } else if(*it == "line"){
+                        cout << "line width: " << tree.getLineWidth() << endl;
+                    } else if(*it == "window"){
+                        cout << "window size: " << tree.getWidth() << "x" << tree.getHeight() << endl;
                     } else {
                         cerr << "unknown property: " << *it << endl;
                         cerr << "type 'help get'" << endl;
                     }
+                }
+            }
+        } else if(command[0] == "set") {
+            if(command.size() < 2){
+                cerr << "type 'help set'" << endl;
+            } else {
+                if(command[1] == "radius"){
+                    float radius;
+                    if(command.size() < 3){
+                        radius = 30;
+                    } else {
+                        radius = std::stof(command[2]);
+                    }
+                    tree.setRadius(radius);
+                    tree.requestRedraw();
+                } else if(command[1] == "line"){
+                    float line;
+                    if(command.size() < 3){
+                        line = 2;
+                    } else {
+                        line = std::stof(command[2]);
+                    }
+                    tree.setLineWidth(line);
+                    tree.requestRedraw();
+                } else {
+                    cerr << "unknown property: " << command[1] << endl;
+                    cerr << "type 'help set'" << endl;
                 }
             }
         } else {
