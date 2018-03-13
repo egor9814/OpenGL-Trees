@@ -61,6 +61,10 @@ protected:
 
 private:
     struct GraphicNode;
+    /// Constants for evaluating graphic node's location
+    constexpr static const float R = 40;
+    constexpr static const float W = 2;
+    constexpr static const float OFFSET = 50;
 
     /** Recursive method for delete all nodes */
     void removeNodes(Node *&root) {
@@ -243,11 +247,12 @@ public:
             const auto WIDTH = bounds.width() - OFFSET;
             const auto HEIGHT = bounds.height() - OFFSET;
 
-            auto layout = RectF {OFFSET / 2, R * 2, WIDTH - OFFSET / 2, 0};
+            auto layout = RectF {0, 0, WIDTH, HEIGHT};
+            //layout.translate(OFFSET / 2, OFFSET / 2);
 
-            auto offset = (HEIGHT - R * 2) / treeH;
-            offset = std::max(R / 2, offset);
-            RectF padding{0, 0, offset, offset};
+            auto offset = HEIGHT / treeH;
+            offset = std::max(R*1, offset);
+            RectF padding{0, OFFSET / 2, OFFSET / 2, offset};
 
             std::vector<GraphicNode> nodes;
             getNodes(root, layout, R, W, padding, nodes, static_cast<unsigned long>(-1));
@@ -307,17 +312,10 @@ protected:
     }
 
 private:
-    /// Constants for evaluating node's location
-    constexpr static const float R = 40;
-    constexpr static const float W = 2;
-    constexpr static const float OFFSET = 50;
-    constexpr static const float START_OFFSET = 20;
-
     /** Drawing element for node */
     struct GraphicNode {
         std::string key; /// string of key
         unsigned long index; /// index of node
-        unsigned long level; /// depth of node
         /** Location type */
         enum Type {
             Top, Center, Bottom
@@ -328,15 +326,15 @@ private:
         float x, y; /// node's location
         std::vector<GraphicNode> nodes; /// node's children
 
-        GraphicNode(std::string &&key, unsigned long index, unsigned long level,
+        GraphicNode(std::string &&key, unsigned long index,
                     Type type,
                     float radius, float width, float x, float y)
-                : key(std::move(key)), index(index), level(level),
+                : key(std::move(key)), index(index),
                   type(type),
                   radius(radius), width(width), x(x), y(y), nodes() {}
 
         GraphicNode(const GraphicNode &n)
-                : key(n.key), index(n.index), level(n.level),
+                : key(n.key), index(n.index),
                   type(n.type),
                   radius(n.radius), width(n.width), x(n.x), y(n.y), nodes(n.nodes) {}
     };
@@ -348,12 +346,12 @@ private:
             return;
 
         //const auto pw = padding.width();
-        const auto startX = layout.centerX();
+        const auto startX = layout.centerX() + padding.width();
         /*if(startX > layout.right)
             startX = layout.right;
         else if(startX < layout.left)
             startX = layout.left;*/
-        const auto startY = layout.centerY();
+        const auto startY = padding.top + padding.bottom * level + r / 2;
 
         if (foundCandidate && !foundCandidate->setup) {
             if (!removeCandidate || !removeCandidate->setup) {
@@ -385,14 +383,17 @@ private:
 
 
         auto t = level == 0 ? GraphicNode::Top : (n->count() == 0 ? GraphicNode::Bottom : GraphicNode::Center);
-        GraphicNode node(std::to_string(n->key), index, level, t, r, w, startX, startY);
+        GraphicNode node(std::to_string(n->key), index, t, r, w, startX, startY);
 
         unsigned long count = n->childCount;
         if (count > 0) {
             const auto width = layout.width() / count;
 
-            auto sector = RectF {layout.left, startY, layout.left + width, startY + padding.height() * 2}
-                    .translateY(r / 2);
+            /*auto sector = RectF {layout.left, startY, layout.left + width, startY + padding.height() * 2}
+                    .translateY(r / 2);*/
+            //auto sector = RectF {0, layout.top, width, layout.bottom};
+            RectF sector(layout);
+            sector.right = layout.left + width;
             /*auto p = layout.left+pw/2;
             if(sector.right + p < layout.right){
                 sector.translateX(p);
