@@ -43,6 +43,19 @@ bool CanvasGL::antialiasing(bool enable) {
     return res;
 }
 
+bool CanvasGL::vertexArray(bool enable) {
+    bool res = va;
+    if(enable != va){
+        va = enable;
+        if(enable){
+            glEnableClientState(GL_VERTEX_ARRAY);
+        } else {
+            glDisableClientState(GL_VERTEX_ARRAY);
+        }
+    }
+    return res;
+}
+
 
 // help functions
 void setColor(int color) {
@@ -110,6 +123,7 @@ void CanvasGL::draw(Paint paint) {
 
 void CanvasGL::drawPath(unsigned long pointCount, float *x, float *y, Paint paint) {
     auto aa = antialiasing(paint.isAntiAlias());
+    auto va = vertexArray(true);
     glLineWidth(paint.getWidth());
     ::invert(pointCount, y, h);
     glBegin(GL_LINES);
@@ -119,6 +133,7 @@ void CanvasGL::drawPath(unsigned long pointCount, float *x, float *y, Paint pain
         glVertex2f(x[i + 1], y[i + 1]);
     }
     glEnd();
+    vertexArray(va);
     antialiasing(aa);
 }
 
@@ -256,11 +271,13 @@ void OpenGLApplication::start(const char *title, int width, int height) {
 /*void startAsyncApp(const char *title, int width, int height){
     application->start(title, width, height);
 }*/
-std::thread *OpenGLApplication::startAsync(const char *title, int width, int height) {
+OpenGLApplication::Thread OpenGLApplication::startAsync(const char *title, int width, int height) {
     //return new std::thread(::startAsyncApp, title, width, height);
-    return new std::thread([](const char *title_, int width_, int height_) {
-        ::application->start(title_, width_, height_);
-    }, title, width, height);
+    return {
+            std::thread([](const char *title_, int width_, int height_) {
+                ::application->start(title_, width_, height_);
+            }, title, width, height)
+    };
 }
 
 void onDraw() {

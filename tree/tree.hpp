@@ -426,10 +426,10 @@ private:
     void drawPaths(Canvas *canvas, GraphicNode &root, std::vector<GraphicNode> &nodes) {
         auto p = Paint(true).setWidth(root.width);
         for (GraphicNode &i : nodes) {
-            float x[]{root.x, i.x};
-            float y[]{root.y + root.radius / 2, i.y - root.radius / 2};
+            float x[]{root.x, i.x, i.x};
+            float y[]{root.y + root.radius / 2, root.y + (i.y - root.y) / 2, i.y - root.radius / 2};
             p.setColor(getColorForPath(i.index));
-            canvas->drawPath(2, x, y, p);
+            canvas->drawPath(3, x, y, p);
             drawPaths(canvas, i, i.nodes);
         }
     }

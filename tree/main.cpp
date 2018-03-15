@@ -247,7 +247,6 @@ int main(int argc, char *argv[]) {
     app.setExitCallback([&]() {
         std::cout << "finished!" << std::endl;
         Random::free();
-        //delete thread;
     });
 
     cout << "Welcome to Trees REPL" << endl;

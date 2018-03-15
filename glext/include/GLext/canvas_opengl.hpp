@@ -13,8 +13,10 @@
 class CanvasGL : public Canvas {
     float w = 0, h = 0;
     bool aa = false;
+    bool va = false;
 
     bool antialiasing(bool enable);
+    bool vertexArray(bool enable);
 
 public:
     /** Resize canvas */
@@ -81,7 +83,10 @@ public:
 
     void start(const char *title, int width, int height);
 
-    std::thread *startAsync(const char *title, int width, int height);
+    struct Thread {
+        std::thread thread;
+    };
+    Thread startAsync(const char *title, int width, int height);
 
 
     // slots:
