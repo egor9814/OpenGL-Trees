@@ -11,7 +11,7 @@
 
 /** Tree node
  * T - type of key
- * ChildCount - max count of childs
+ * ChildCount - max count of children
  * Node - inheritor class name
  * */
 template<typename T, unsigned long ChildCount, class Node>

@@ -46,6 +46,10 @@ use_glext(tree)
 
 set(SOURCE_FILES_BT
         btree/main.cpp
+        tree/tree.cpp tree/tree.hpp
+        tree/binary_tree.cpp tree/binary_tree.hpp
+        tree/search_tree.cpp tree/search_tree.hpp
+        tree/config.cpp tree/config.hpp
         btree/balanced_tree.cpp btree/balanced_tree.hpp
         )
 add_executable(btree ${SOURCE_FILES_BT})

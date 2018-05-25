@@ -13,11 +13,11 @@ class BinaryTreeNode : public TreeNode<int, 2, BinaryTreeNode> {
 public:
     BinaryTreeNode(int key, BinaryTreeNode *parent) : TreeNode(key, parent) {}
 
-    BinaryTreeNode *&left() {
+    virtual BinaryTreeNode *&left() {
         return child[0];
     }
 
-    BinaryTreeNode *&right() {
+    virtual BinaryTreeNode *&right() {
         return child[1];
     }
 
