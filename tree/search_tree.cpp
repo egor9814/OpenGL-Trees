@@ -58,7 +58,7 @@ void SearchTree::add(int key) {
     }
 }
 
-BinaryTreeNode *removeNode(BinaryTreeNode *q) {
+BinaryTreeNode *SearchTree::removeNode(BinaryTreeNode *q) {
     BinaryTreeNode *s, *r, *d;
     if (q->right() == nullptr) {
         d = q;
@@ -142,4 +142,13 @@ BinaryTreeNode *findKey(BinaryTreeNode *node, int &key) {
 BinaryTreeNode *SearchTree::findKey(int key) {
     return ::findKey(getRoot(), key);
     //return BinaryTree::findKey(key);
+}
+
+
+BinaryTreeNode* findMin(BinaryTreeNode* node){
+    return node->left() ? findMin(node->left()) : node;
+}
+
+BinaryTreeNode *SearchTree::findMin() {
+    return ::findMin(root);
 }

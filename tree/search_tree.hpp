@@ -21,11 +21,16 @@ public:
 
     bool isSearchTree() override;
 
-    void add(KeyType key) override;
+    void add(int key) override;
 
-    void remove(KeyType key) override;
+    void remove(int key) override;
 
-    Node *findKey(KeyType key) override;
+    Node *findKey(int key) override;
+
+    Node* findMin();
+
+protected:
+    BinaryTreeNode *removeNode(BinaryTreeNode *q);
 };
 
 #endif //OPENGL_TREES_SEARCH_TREE_HPP

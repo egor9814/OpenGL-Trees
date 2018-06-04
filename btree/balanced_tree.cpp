@@ -4,16 +4,28 @@
 
 #include "balanced_tree.hpp"
 
-void BTreeNode::recoverParents() {
-    if (leftB()) {
-        leftB()->parent = this;
-        leftB()->recoverParents();
-    }
-    if (rightB()) {
-        rightB()->parent = this;
-        rightB()->recoverParents();
-    }
+
+int height(BTreeNode* node) {
+    return node ? node->h : 0;
 }
+
+int balance(BTreeNode* node) {
+    return height(node->rightB()) - height(node->leftB());
+}
+
+void fixheight(BTreeNode* node) {
+    auto l = height(node->leftB());
+    auto r = height(node->rightB());
+    node->h = std::max(l, r) + 1;
+}
+
+
+void BTreeNode::draw(Canvas *canvas, float x, float y, float radius) {
+    canvas->drawText(x + radius/2 + 10, y - radius/2, 0, std::to_string(::balance(this)).c_str(),
+                     0.1f, Paint(true).setColor(0xffff0000));
+}
+
+
 
 BTree::BTree() : SearchTree() {}
 
@@ -41,159 +53,99 @@ BTree::BTree(std::vector<int> &keys) : SearchTree() {
 }
 
 
-BTreeNode *addNode(BTreeNode *node, int key, bool &b, BTreeNode *parent = nullptr) {
-    if (!node) {
-        node = new BTreeNode(key, parent);
-        b = true;
-        return node;
-    }
 
-    if (node->key == key) {
-        b = false;
-        return node;
-    }
+BTreeNode* rotateRight(BTreeNode* node) {
+    auto q = node->leftB();
+    node->setLeft(q->rightB());
+    q->setRight(node);
+    fixheight(node);
+    fixheight(q);
+    return q;
+}
 
-    if (key < node->key) {
-        node->leftB() = addNode(node->leftB(), key, b, node);
-        if (!b)
-            return node;
-        if (node->balance == 1) {
-            node->balance = 0;
-            b = false;
-            return node;
-        }
-        if (node->balance == 0) {
-            node->balance = -1;
-            return node;
-        }
-        if (node->balance == -1) {
-            node->balance = -2;
-            auto left = node->leftB();
-            if (left->balance == -1) {
-                node->leftB() = left->rightB();
-                left->rightB() = node;
-                node->balance = left->balance = 0;
-                node = left;
-            } else {
-                auto right = left->rightB();
-                left->rightB() = right->leftB();
-                right->leftB() = left;
-                node->leftB() = right->rightB();
-                right->rightB() = node;
-                switch (right->balance) {
-                    case -1:
-                        node->balance = 1;
-                        left->balance = 0;
-                        break;
+BTreeNode* rotateLeft(BTreeNode* node) {
+    auto q = node->rightB();
+    node->setRight(q->leftB());
+    q->setLeft(node);
+    fixheight(node);
+    fixheight(q);
+    return q;
+}
 
-                    case 1:
-                        node->balance = 0;
-                        left->balance = -1;
-                        break;
-
-                    case 0:
-                        node->balance = left->balance = 0;
-                        break;
-
-                    default:
-                        break;
-                }
-                right->balance = 0;
-                node = right;
+BTreeNode* rebalance(BTreeNode* node) {
+    fixheight(node);
+    switch (balance(node)){
+        case 2:
+            if(balance(node->rightB()) < 0) {
+                node->setRight(rotateRight(node->rightB()));
             }
-            b = false;
+            return rotateLeft(node);
+
+        case -2:
+            if(balance(node->leftB()) > 0) {
+                node->setLeft(rotateLeft(node->leftB()));
+            }
+            return rotateRight(node);
+
+        default:
             return node;
-        }
     }
-    node->rightB() = addNode(node->rightB(), key, b, node);
-    if (!b)
-        return node;
-    if (node->balance == -1) {
-        node->balance = 0;
-        b = false;
-        return node;
-    }
-    if (node->balance == 0) {
-        node->balance = 1;
-        return node;
-    }
-    if (node->balance == 1) {
-        node->balance = 2;
-    }
-    auto right = node->rightB();
-    if (right->balance == 1) {
-        node->rightB() = right->leftB();
-        right->leftB() = node;
-        node->balance = right->balance = 0;
-        node = right;
-    } else {
-        auto left = right->leftB();
-        right->leftB() = left->rightB();
-        left->rightB() = right;
-        node->rightB() = left->leftB();
-        left->leftB() = node;
-        switch (left->balance) {
-            case 1:
-                node->balance = -1;
-                right->balance = 0;
-                break;
+}
 
-            case -1:
-                node->balance = 0;
-                right->balance = 1;
-                break;
+BTreeNode *addNode(BTreeNode *node, int key, BTreeNode *parent = nullptr) {
+    if(!node)
+        return new BTreeNode(key, parent);
 
-            case 0:
-                node->balance = right->balance = 0;
-                break;
+    if(key < node->key)
+        node->setLeft(addNode(node->leftB(), key, node));
+    else
+        node->setRight(addNode(node->rightB(), key, node));
 
-            default:
-                break;
-        }
-        left->balance = 0;
-        node = left;
-    }
-    b = false;
-    return node;
+    return rebalance(node);
 }
 
 void BTree::add(int key) {
-    bool balance;
-    root = addNode(dynamic_cast<BTreeNode *>(root), key, balance);
-    if (root)
-        dynamic_cast<BTreeNode *>(root)->recoverParents();
-    root->parent = nullptr;
+    root = addNode(dynamic_cast<BTreeNode*>(root), key);
 }
 
 
-BTreeNode *remove(BTreeNode *node, int key) {
-    if (!node)
+
+BTreeNode* removeMin(BTreeNode* node) {
+    if(!node->left())
+        return node->rightB();
+
+    node->setLeft(removeMin(node->leftB()));
+    return rebalance(node);
+}
+
+BTreeNode* findMin(BTreeNode* node) {
+    return node->leftB() ? findMin(node->leftB()) : node;
+}
+
+BTreeNode* remove(BTreeNode* node, int key){
+    if(!node)
         return node;
 
-    if (node->key == key) {
-        if (!node->leftB())
-            return node->rightB();
-        if (!node->rightB())
-            return node->leftB();
-
-        auto &left = node->leftB();
-        while (left->leftB() && left->rightB()) {
-            left = left->leftB();
-        }
-
-        if (left->leftB() == nullptr) {
-            left->leftB() = node->rightB();
-        } else {
-            left->rightB() = node->rightB();
-        }
-
-        return node->leftB();
+    if(key < node->key)
+        node->setLeft(remove(node->leftB(), key));
+    else if(key > node->key)
+        node->setRight(remove(node->rightB(), key));
+    else {
+        auto l = node->leftB();
+        auto r = node->rightB();
+        delete node;
+        if(!r)
+            return l;
+        auto min = findMin(r);
+        min->setRight(removeMin(r));
+        min->setLeft(l);
+        return rebalance(min);
     }
-    node->leftB() = remove(node->leftB(), key);
-    node->rightB() = remove(node->rightB(), key);
-    return node;
+
+    return rebalance(node);
 }
 
 void BTree::remove(int key) {
-    root = ::remove(dynamic_cast<BTreeNode *>(root), key);
+    root = ::remove(dynamic_cast<BTreeNode*>(root), key);
+    invalidateSelf();
 }

@@ -21,6 +21,14 @@ public:
         return child[1];
     }
 
+    void setLeft(BinaryTreeNode* node) {
+        setChild(node, 0);
+    }
+
+    void setRight(BinaryTreeNode* node) {
+        setChild(node, 1);
+    }
+
 };
 
 
@@ -30,9 +38,9 @@ public:
 
     BinaryTree() : Tree() {}
 
-    BinaryTree(unsigned long keyCount, std::function<int(std::vector<int> &)> randomKeyGenerator)
+    BinaryTree(unsigned long keyCount, std::function<KeyType(std::vector<KeyType> &)> randomKeyGenerator)
             : Tree() {
-        std::vector<int> keys;
+        std::vector<KeyType> keys {};
         for (unsigned long i = 0; i < keyCount; i++) {
             keys.push_back(randomKeyGenerator(keys));
         }
@@ -41,14 +49,14 @@ public:
         }
     }
 
-    BinaryTree(unsigned long keyCount, int *keys)
+    BinaryTree(unsigned long keyCount, KeyType *keys)
             : Tree() {
         for (unsigned long i = 0; i < keyCount; i++) {
             add(keys[i]);
         }
     }
 
-    explicit BinaryTree(std::vector<int> &keys)
+    explicit BinaryTree(std::vector<KeyType> &keys)
             : Tree() {
         for (auto &i : keys) {
             add(i);
@@ -67,7 +75,7 @@ public:
         VisitType_LeftRightRoot,
     };
 
-    std::vector<KeyType> visit(Node *node, VisitType type = VisitType_NONE);
+    std::vector<KeyType> visit(BinaryTreeNode *node, VisitType type = VisitType_NONE);
 
     std::vector<KeyType> visit(VisitType type = VisitType_NONE) {
         return visit(root, type);

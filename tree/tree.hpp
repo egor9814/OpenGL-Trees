@@ -22,7 +22,7 @@ struct TreeNode {
     const unsigned long childCount = ChildCount; /// maximum child count
     Node *parent; /// parent of current node
     Node *child[ChildCount]{nullptr}; /// children of current node
-    unsigned long height; /// height of current node
+    unsigned long level; /// height of current node
     unsigned long childNum = 0; /// child number (KOSTYL for add new node in simple tree)
 
     /** Get count of children */
@@ -41,8 +41,18 @@ struct TreeNode {
 
     TreeNode(KeyType key, Node *parent)
             : key(key), parent(parent) {
-        height = parent == nullptr ? 1UL : (1 + parent->height);
+        level = parent == nullptr ? 1UL : (1 + parent->level);
     }
+
+
+    void setChild(Node* node, unsigned long index) {
+        child[index] = node;
+        if(node)
+            node->parent = dynamic_cast<Node*>(this);
+    }
+
+
+    virtual void draw(Canvas *canvas, float x, float y, float radius) {}
 
 };
 
@@ -111,11 +121,23 @@ private:
     void height(Node *root, unsigned long &h) {
         if (!root)
             return;
-        if (root->height > h)
-            h = root->height;
+        if (root->level > h)
+            h = root->level;
         for (auto i = 0UL; i < root->childCount; i++) {
             height(root->child[i], h);
         }
+    }
+
+    unsigned long heightOf(Node* node) {
+        if(!node)
+            return 0;
+        auto h = heightOf(node->child[0]);
+        for(auto i = 0ul; i < node->childCount; i++){
+            auto hMax = heightOf(node->child[i]);
+            if(hMax > h)
+                h = hMax;
+        }
+        return h + 1;
     }
 
 public:
@@ -188,15 +210,12 @@ public:
         return findNode(key, root);
     }
 
-    virtual void findMax() {}
-
-    virtual void findMin() {}
-
     /** Find height of tree */
     unsigned long findHeight() {
-        auto h = 0UL;
+        /*auto h = 0UL;
         height(root, h);
-        return h;
+        return h;*/
+        return heightOf(root);
     }
 
 
@@ -258,7 +277,7 @@ public:
             const auto WIDTH = bounds.width() - offset;
             const auto HEIGHT = bounds.height() - offset;
 
-            auto layout = RectF {0, 0, WIDTH, HEIGHT};
+            auto layout = RectF{0, 0, WIDTH, HEIGHT};
             //layout.translate(OFFSET / 2, OFFSET / 2);
 
             auto offset = HEIGHT / treeH;
@@ -336,18 +355,22 @@ private:
         float width; /// line width
         float x, y; /// node's location
         std::vector<GraphicNode> nodes; /// node's children
+        NodeType* node;
 
         GraphicNode(std::string &&key, unsigned long index,
                     Type type,
-                    float radius, float width, float x, float y)
+                    float radius, float width, float x, float y,
+                    NodeType* node)
                 : key(std::move(key)), index(index),
                   type(type),
-                  radius(radius), width(width), x(x), y(y), nodes() {}
+                  radius(radius), width(width), x(x), y(y), nodes(),
+                  node(node) {}
 
         GraphicNode(const GraphicNode &n)
                 : key(n.key), index(n.index),
                   type(n.type),
-                  radius(n.radius), width(n.width), x(n.x), y(n.y), nodes(n.nodes) {}
+                  radius(n.radius), width(n.width), x(n.x), y(n.y), nodes(n.nodes),
+                  node(n.node) {}
     };
 
     /** Generate nodes for draw */
@@ -394,7 +417,7 @@ private:
 
 
         auto t = level == 0 ? GraphicNode::Top : (n->count() == 0 ? GraphicNode::Bottom : GraphicNode::Center);
-        GraphicNode node(std::to_string(n->key), index, t, r, w, startX, startY);
+        GraphicNode node(std::to_string(n->key), index, t, r, w, startX, startY, n);
 
         unsigned long count = n->childCount;
         if (count > 0) {
@@ -454,6 +477,9 @@ private:
         for (GraphicNode &i : nodes) {
             drawCircles(canvas, i, i.nodes, level);
         }
+
+        if(root.node)
+            root.node->draw(canvas, x, y, r);
     }
 
     /** Structure for holding candidate node for removing */

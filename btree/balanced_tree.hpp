@@ -11,19 +11,19 @@
 
 class BTreeNode : public BinaryTreeNode {
 public:
-    int balance = 0;
+    int h = 1;
 
     BTreeNode(int key, BTreeNode *parent) : BinaryTreeNode(key, parent){}
 
-    BTreeNode*& leftB() {
+    BTreeNode* leftB() {
         return reinterpret_cast<BTreeNode *&>(BinaryTreeNode::left());
     }
 
-    BTreeNode*& rightB() {
+    BTreeNode* rightB() {
         return reinterpret_cast<BTreeNode *&>(BinaryTreeNode::right());
     }
 
-    void recoverParents();
+    void draw(Canvas *canvas, float x, float y, float radius) override;
 };
 
 

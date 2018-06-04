@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
             if (command.size() < 2) {
                 cerr << "type 'help get'" << endl;
             } else {
-                for(auto it = command.begin()++; it != command.end(); it++){
+                for(auto it = ++command.begin(); it != command.end(); it++){
                     if(*it == "height"){
                         cout << "height: " << tree.findHeight() << endl;
                     } else if(*it == "radius"){
